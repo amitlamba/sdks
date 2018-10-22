@@ -8,6 +8,37 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:322296766925:android:1b859f12b706260d",
+        "android_client_info": {
+          "package_name": "com.userndot.androidsdk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322296766925-degu8ntlkj6c5jh9bc89it9tcremrtbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIx1TkULzRey6BZ98FoA4yCMWqIbVpkO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:322296766925:android:8335eb1a4b93e151",
         "android_client_info": {
           "package_name": "com.userndot.sdk.android"
@@ -42,6 +73,37 @@
         "mobilesdk_app_id": "1:322296766925:android:20ac967a0f9b78e3",
         "android_client_info": {
           "package_name": "courses.pluralsight.com.tabianconsulting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322296766925-degu8ntlkj6c5jh9bc89it9tcremrtbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIx1TkULzRey6BZ98FoA4yCMWqIbVpkO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322296766925:android:10208fc2d942317d",
+        "android_client_info": {
+          "package_name": "jogendra.com.location"
         }
       },
       "oauth_client": [
