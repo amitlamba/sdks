@@ -10,11 +10,12 @@ import java.util.*
 
 open class Event {
     lateinit var name: String
-//    var identity: Identity = Identity()
-//    private var creationTime: LocalDateTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    var identity: Identity = Identity()
+    //    private var creationTime: LocalDateTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //        LocalDateTime.now(ZoneId.of("UTC"))
 //    } else {
 //        TODO("VERSION.SDK_INT < O")
+//
 //    }
     var ipAddress: String? = null
     var city: String? = null
@@ -53,7 +54,7 @@ class Identity(
 
 class EventUser {
 
-//    var identity: Identity = Identity()
+    var identity: Identity = Identity()
     var email: String? = null
     var uid: String? = null //this is id of the user client has provided
     var undId: String? = null

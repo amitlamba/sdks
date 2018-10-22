@@ -1,18 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.userndot.androidsdk">
+    package="com.userndot.androidsdk"
+    >
+
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        >
+
         <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <meta-data
+            android:name="USERNDOT_USER_ID"
+            android:value="userndot"
+            />
+        <meta-data
+            android:name="USERNDOT_TOKEN"
+            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjEwMDMiLCJjbGllbnRJZCI6IjEwMDEiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzEzMDAwNTQ1MDQsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.ocJTeX3DNof0E5ZdLIen25Mt0K3gf1zuYdkdAty_xiY05PcmF4aNqKeMy5UcjjKM-vMQkscCS6hUrEP6qlWjSg"
+            />
+        <meta-data android:name="STAGGING_TOKEN"
+            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYiLCJjbGllbnRJZCI6IjMiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzA1Mzc2MjM5MzMsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.yps1e8oJGdDJkN0C77gwjd_g9Jc2Ti4GvV-ViUMKoq0Msz8Dk8LGzSVXDyk6lh_HuX_FHuFjIh49OQFsUWSmYw"/>
+
     </application>
 
 </manifest>

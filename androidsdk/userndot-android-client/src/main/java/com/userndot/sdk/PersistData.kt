@@ -1,6 +1,7 @@
 package com.userndot.sdk.android
 
 import android.content.Context
+import android.util.Log
 import androidx.room.*
 import androidx.room.Database
 

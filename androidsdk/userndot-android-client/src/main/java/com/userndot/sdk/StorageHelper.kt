@@ -71,7 +71,7 @@ class StorageHelper {
             try {
                 editor.apply()
             } catch (t: Throwable) {
-                Logger.v("CRITICAL: Failed to persist shared preferences!", t)
+//                Logger.v("CRITICAL: Failed to persist shared preferences!", t)
             }
 
         }

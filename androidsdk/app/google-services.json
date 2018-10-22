@@ -1,0 +1,104 @@
+{
+  "project_info": {
+    "project_number": "322296766925",
+    "firebase_url": "https://cloudmessaging-d2f78.firebaseio.com",
+    "project_id": "cloudmessaging-d2f78",
+    "storage_bucket": "cloudmessaging-d2f78.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322296766925:android:8335eb1a4b93e151",
+        "android_client_info": {
+          "package_name": "com.userndot.sdk.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322296766925-degu8ntlkj6c5jh9bc89it9tcremrtbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIx1TkULzRey6BZ98FoA4yCMWqIbVpkO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322296766925:android:20ac967a0f9b78e3",
+        "android_client_info": {
+          "package_name": "courses.pluralsight.com.tabianconsulting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322296766925-degu8ntlkj6c5jh9bc89it9tcremrtbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIx1TkULzRey6BZ98FoA4yCMWqIbVpkO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322296766925:android:d43fb30d001d6aa2",
+        "android_client_info": {
+          "package_name": "userndot.com.androidsdk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322296766925-degu8ntlkj6c5jh9bc89it9tcremrtbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIx1TkULzRey6BZ98FoA4yCMWqIbVpkO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

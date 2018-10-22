@@ -12,7 +12,9 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -20,15 +22,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+//        exclude 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
+//        exclude 'META-INF/androidx.legacy_legacy-support-core-utils.version'
+//        exclude 'META-INF/androidx.print_print.version'
+//        exclude 'META-INF/androidx.documentfile_documentfile.version'
+//        exclude 'META-INF/androidx.loader_loader.version'
+//        exclude 'META-INF/androidx.versionedparcelable_versionedparcelable.version'
+//        exclude 'META-INF/androidx.*'
+//        exclude 'META-INF/proguard/androidx*'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:design:28.0.0'
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0-beta02'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta02'
+    implementation project (':userndot-android-client')
+//    implementation 'com.google.android.gms:play-services-location:16.0.0'
 }
+apply plugin: 'com.google.gms.google-services'
