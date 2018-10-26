@@ -70,4 +70,9 @@ class DeviceInformation {
                 .append("appPackageName").append("=").append(this.appPackageName).append(";")
         return sb.toString()
     }
+
+    fun getAppIconAsIntId(context: Context):Int{
+        val ai = context.applicationInfo
+        return ai.icon
+    }
 }

@@ -12,7 +12,7 @@ class ManifestInfo {
     private var useADID: Boolean = false
     private var appLaunchedDisabled: Boolean = false
     private var notificationIcon: String? = null
-    private var instance: ManifestInfo? = null
+
     private var excludedActivities: String? = null
     private var sslPinning: Boolean = false
 
@@ -56,12 +56,15 @@ class ManifestInfo {
         sslPinning = "1" == _getManifestStringValueForKey(metaData, Constants.LABEL_SSL_PINNING)
     }
 
-    @Synchronized
-    fun getInstance(context: Context): ManifestInfo? {
-        if (instance == null) {
-            instance = ManifestInfo(context)
+    companion object {
+        private var instance: ManifestInfo? = null
+        @Synchronized
+        fun getInstance(context: Context): ManifestInfo? {
+            if (instance == null) {
+                instance = ManifestInfo(context)
+            }
+            return instance
         }
-        return instance
     }
 
     internal fun getAccountId(): String? {

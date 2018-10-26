@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import kotlin.collections.HashMap
 
 open class Event {
     lateinit var name: String
@@ -55,6 +56,7 @@ class Identity(
 class EventUser {
 
     var identity: Identity = Identity()
+    var token:String?=null
     var email: String? = null
     var uid: String? = null //this is id of the user client has provided
     var undId: String? = null
@@ -91,5 +93,45 @@ class Data{
     var type:String?=null
 
 
+
+}
+
+class Message{
+    //only one of 1st 3 property
+    var token:String?=null
+    var topic:String?=null
+    var condition:String?=null
+    var name:String?=null
+    var notification:CommonNotification?=null
+    var data:HashMap<String,String>?=null
+    var android:AndroidConfig?=null
+//    var webpush:WebConfig?=null
+//    var apns:ApnsConfig?=null
+}
+
+class CommonNotification{
+    var title:String?=null
+    var body:String?=null
+}
+
+class AndroidConfig{
+    var collapse_key:String?=null
+    var ttl:String?=null
+    var data:HashMap<String,String>?=null
+    var notification:AndroidNotification?=null
+    var priority:String?=null  //enum High Normal
+}
+
+class AndroidNotification{
+    var title:String?=null
+    var body:String?=null
+    var sound:String?=null //  /res/raw/1.mp3 //optional
+    var color:String?=null //  #ffffff   //optional
+    var icon:String?=null  //  drawable/pic1 //optional
+    var tag:String?=null   //optional
+    var click_action:String?=null
+
+    var body_loc_key:String?=null
+    var body_loc_args:List<String>?=null
 
 }

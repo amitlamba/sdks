@@ -21,7 +21,7 @@ public class ExampleUnitTest {
 
     @Test
     public void testDatabase(){
-        UserNDotAPI obj=new UserNDotAPI();
+//        UserNDot obj=UserNDot.Companion.getDefaultInstance();
         HashMap<String,String> map=new HashMap<>();
         map.put("segmentid","6");
         map.put("value","4");
@@ -43,7 +43,7 @@ public class ExampleUnitTest {
 //
 //        user.setIdentity(identity);
 
-        String in=obj.sendAppLocalData("http://userndot.com/event/event/initialize","POST",null,null);
+//        String in=obj.sendAppLocalData("http://userndot.com/event/event/initialize","POST",null,null);
 //        obj.sendAppLocalData("http://userndot.com/event/push/event","POST",null,event);
 //        obj.sendAppLocalData("http://userndot.com/event/push/profile","POST",null,user);
     }

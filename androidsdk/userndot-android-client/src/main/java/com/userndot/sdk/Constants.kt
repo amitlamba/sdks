@@ -14,8 +14,10 @@ class Constants {
         internal val LABEL_SENDER_ID = "GCM_SENDER_ID"
         internal val USERNDOT_STORAGE_TAG = "USERNDOT_STORAGE_TAG"
         internal val USERNDOT_LOG_TAG = "USERNDOT_LOG_TAG"
-
+        internal val DEEP_LINK_KEY=""
         internal val HEADER_DOMAIN_NAME = "X-USERNDOT"
         internal val HEADER_MUTE = "X-USERNDOT-MUTE"
+        internal var FROMUSERNDOT="userndot"
+        internal var ICON_BASE_URL=""
     }
 }
