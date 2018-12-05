@@ -3,6 +3,7 @@ package com.userndot.androidsdk
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import com.userndot.sdk.android.Event
 import com.userndot.sdk.android.EventUser
@@ -29,25 +30,26 @@ class MainActivity : AppCompatActivity() {
 //        defaultInstance?.findLocationOnUserNDotEnd()
         Log.e("UserNDot instance",defaultInstance.toString())
 
-//        var config= UserNDotConfig.createInstance(this,"Account id","Tokken Id")
+//        var config= UserNDotConfig.createInstance(this,"Account id","Token Id")
 
 //        configInstance= UserNDot.getInstanceWithConfig(this,config = config)
 
         //record event
         (event).setOnClickListener {
-            Log.e("event","cliked")
+            Log.e("event","clicked")
             var e = Event()
             e.city = "gurgaon"
-            e.name = "Add to cart"
+            e.name = "Search"
             e.attributes= HashMap()
             e.attributes.put("Item","Shoes")
+            e.attributes.put("new","new")
             e.country="India"
             e.state="Haryana"
             e.userIdentified=false
-            defaultInstance!!.pushEvent(e)
+            defaultInstance?.pushEvent(e)
         }
         //Record an event with properties
-//        eventWithProps.setOnClickListener(View.OnClickListener {
+//        eventWithProps?.setOnClickListener(View.OnClickListener {
 //            val prodViewedAction = HashMap<String, Any>()
 //            prodViewedAction["Product Name"] = "Casio Chronograph Watch"
 //            prodViewedAction["Category"] = "Mens Accessories"
@@ -64,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         (profile).setOnClickListener {
             Log.e("profile","clicked")
             var user = EventUser()
+            user.uid="user3"
             user.city="Gurugram"
             user.address=""
             user.country="India"
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
         (logout).setOnClickListener{
             Log.e("logout","clicked")
-            defaultInstance?.onLogout()
+            defaultInstance?.onUserLogout()
         }
 
     }

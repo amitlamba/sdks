@@ -9,7 +9,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -19,16 +18,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings.Global.getString
 import android.util.Log
-import androidx.annotation.IntegerRes
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.firebase.iid.FirebaseInstanceId
-import com.userndot.sdk.R
 import com.userndot.sdk.UNDPushNotificationIntentService
 import com.userndot.sdk.UNDPushNotificationReceiver
 import com.userndot.sdk.Utils
@@ -36,10 +31,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.lang.Exception
-import java.lang.NullPointerException
-import java.lang.NumberFormatException
-import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -47,11 +38,8 @@ import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import javax.net.ssl.HttpsURLConnection
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -63,17 +51,18 @@ class UserNDot {
     private var lock: Lock
     private var commsRunnable: Runnable? = null
     private lateinit var database: MyDatabase
-    private var BASE_URL = "http://userndot.com"
+    private var BASE_URL = "http://192.168.0.109:8090"
     private var DEFAULT_URL = BASE_URL + "/event/check"
     private var INITIALIZE_URL = BASE_URL + "/event/event/initialize"
     private var PROFILE_URL = BASE_URL + "/event/push/profile"
     private var EVENT_URL = BASE_URL + "/event/push/event"
+    private var EVENT_TRACKING_URL = BASE_URL + "/event/android/tracking"
     private var PATH = "USERNDOT"
     private val DELAY = 3000L
     private val CONNTIMEOUT=5000
-    private val DEFAULT_NOTIFICATION_ID=-1000
+//    private val DEFAULT_NOTIFICATION_ID=1000
     private lateinit var deviceInfo: DeviceInformation
-    private var identity: Identity? = Identity()
+    private var identity: Identity = Identity()
     private var mapper = ObjectMapper()
     private var logger: Logger
     private var CHANNEL_ID:String="1000"
@@ -118,7 +107,7 @@ class UserNDot {
             var packageManager = context.packageManager
             var applicationInfo = packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
             var bundle = applicationInfo.metaData
-            return bundle.getString("STAGGING_TOKEN")
+            return bundle.getString("STAGING_TOKEN")
         }
 
         /*
@@ -130,12 +119,14 @@ class UserNDot {
             pair.forEach{
                 var key=it.key
                 var value=it.value
-                try{
-                    var newvalue=Integer.parseInt(value.toString())
-                    prefEditor.putInt(key,newvalue)
-                }catch (ex:NumberFormatException){
-                    prefEditor.putString(key,value?.toString())
-                }
+//                try{
+//                    var newvalue=Integer.parseInt(value?.toString())
+//                    prefEditor.putInt(key,newvalue)
+//                }catch (ex:NumberFormatException){
+//                    prefEditor.putString(key,value?.toString()?:null)
+//                }
+                Log.e("adding ${key}","value ${value?.toString()}")
+                prefEditor.putString(key,value?.toString())
             }
             prefEditor.commit()
         }
@@ -146,14 +137,73 @@ class UserNDot {
             var logger:Logger=Logger.getInstance(UserNDot.LogLevel.INFO)
             return UserNDotConfig(userNDotID = token, fcmSenderID = "", debugLevel = 0, logger = logger, sslPinning = false)
         }
-
         fun createNotification(context: Context,bundle: Bundle){
-            Log.e("create ","notification ${instance}")
+            if(instance==null){
+                getDefaultInstance(context)
+            }
             instance?.buildNotification(context,bundle)
         }
-        
+
+
         fun handleNotificationClicked(context: Context?,notification:Bundle){
-            //push notification click event on server
+            var mongoId=notification.getString("mongo_id")
+            var campaignId=notification.getString("campaign_id")
+            var clientId=notification.getString("client_id")
+            var instance=UserNDot.instance
+            if(instance==null){
+                if (context!=null) getDefaultInstance(context)
+            }
+
+            /*
+            * sending notification click event to server
+            * */
+            instance?.logger?.info("Notification Click handled")
+                instance?.postAsync(Runnable {
+                    var event = Event()
+                    event.name = "Notification Clicked"
+                    var map = HashMap<String, Any>()
+                    map.put("title", notification.getString("title"))
+                    map.put("body", notification.getString("body"))
+                    map.put("campaignId",campaignId)
+                    event.attributes = map
+                    instance.pushEventData(event)
+                })
+
+            /*
+            * tracking the event.
+            * */
+            instance?.postAsync(Runnable {
+                var data=Data()
+                data.objectData="{\"mongoId\":\"${mongoId}\",\"clientId\":\"${clientId}\"}"
+                data.type="track"
+                data.time=instance.getDate()
+                    if (context!=null) instance.queueEvent(context,data)
+            })
+
+        }
+
+        fun tokenRefresh(token:String?,context: Context){
+            Log.e("Token","Refreshed")
+            var instance=UserNDot.instance
+            if(instance==null) UserNDot.getDefaultInstance(context)
+            instance?.logger?.info("Token refreshed")
+            instance?.logger?.info("new Token is $token")
+            //Todo enhancement send token to server currently we are saving it local and send to server when user login
+            var map= HashMap<String,Any?>()
+            map.put("token",token)
+            saveSharedPreference(context,map)               //saving token locally
+
+//            instance?.postAsync(Runnable {
+//                var idenity= instance.identity
+//                var eventUser=EventUser()
+//                eventUser.androidToken=token
+//                if (idenity!=null && idenity.clientId!= -1){ eventUser.identity=idenity}
+//                else{ instance?.initializeIdentity()
+//                    idenity= instance.identity
+//                    if (idenity!=null){ eventUser.identity=idenity}
+//                }
+//                instance.pushProfile(eventUser)
+//            })
         }
 
     }
@@ -165,26 +215,34 @@ class UserNDot {
         this.handler = Handler(Looper.getMainLooper())
         this.executor = Executors.newFixedThreadPool(1)
         this.lock = ReentrantLock()
-//        postAsync(Runnable {
-//            initializeIdentity()
-//        })
+        postAsync(Runnable {
+            initializeIdentity()
+        })
     }
     /*
     return value of int and string type store in shared preference
      */
-    private fun getSharedPreference(values: HashMap<String,Any?>):HashMap<String,Any>{
+    private fun getSharedPreference(values: HashMap<String,Any?>):HashMap<String,Any?>{
         var pref = context.getSharedPreferences(PATH, Context.MODE_PRIVATE)
-        var map:HashMap<String,Any> = HashMap()
+        var map:HashMap<String,Any?> = HashMap()
         values.forEach{
             var key=it.key
             var value=it.value
-            try{
-                var newvalue=Integer.parseInt(value?.toString())
-                map.put(key,pref.getInt(key,newvalue))
-            }catch (ex:NumberFormatException){
-                map.put(key,pref.getString(key, value?.toString()))
+
+            var result=pref.getString(key,null)
+            Log.e("getting ${key}","value ${result?:value}")
+            when(key){
+                "clientId"-> map.put(key,result?:value)
+                "userId" -> map.put(key,result?:value)
+                "deviceId" -> map.put(key,result?:value)
+                "sessionId" -> map.put(key,result?:value)
+                else -> map.put(key,result)
             }
+
+
+
         }
+        logger.info("Retriveing sharef pref",mapper.writeValueAsString(map))
         return map
     }
     /*
@@ -194,7 +252,6 @@ class UserNDot {
         logger.info("Thread inside initialize identity", Thread.currentThread().name)
         this.database = UserNDotDatabase.getDatabase(this.context)      //getting database connection
         this.deviceInfo = DeviceInformation(context)                    //getting device info
-        clearQueues(context)
         try {
             var map=HashMap<String,Any?>()
             map.put("userId",null)
@@ -206,12 +263,13 @@ class UserNDot {
             if (result["sessionId"]== "" || result["deviceId"] == "") {
                 var data = Data()
                 data.type = "identity"
+                data.objectData=mapper.writeValueAsString(identity)
                 queueEvent(context, data)
             } else {
                 identity?.clientId = Integer.parseInt(result["clientId"].toString())
                 identity?.deviceId = result["deviceId"].toString()
                 identity?.sessionId = result["sessionId"].toString()
-                identity?.userId = result["userId"].toString()
+                identity?.userId = result["userId"]?.toString()
             }
         } finally {
             logger.info("identity Initialize finish")
@@ -302,20 +360,18 @@ class UserNDot {
     /*
     send data to backend
      */
+    //fixme check identity is null in any case
     private fun sendQueue(context: Context, data: List<Data>) {
-        var connectivity = checkConectivity()       //check connectivity
-        logger.info("Handshake To Server ${connectivity}")
+        var connectivity = checkConectivity()
+        logger.info("Handshake To Server $connectivity")
         if (connectivity) {
-            //check is it possible to build connection one time
-            var eventUserConn = buildConnection(PROFILE_URL, "POST")
-            var eventConn = buildConnection(EVENT_URL, "POST")
-            var identityConn = buildConnection(INITIALIZE_URL, "POST")
             try {
                 for (data in data) {
                     logger.info("Entity Type", "${data.type}")
                     logger.info("Data id send to server", "${data.id}")
                     when (data.type) {
                         "eventUser" -> {
+                            var eventUserConn = buildConnection(PROFILE_URL, "POST")
                             var eventUser = mapper.readValue(data.objectData, EventUser::class.java)
                             if (eventUser.identity.sessionId == "") {
                                 eventUser.identity = identity!!
@@ -325,6 +381,7 @@ class UserNDot {
                             sendToServer(eventUserConn, data, true)
                         }
                         "event" -> {
+                            var eventConn = buildConnection(EVENT_URL, "POST")
                             var event = mapper.readValue(data.objectData, Event::class.java)
                             if (event.identity.sessionId == "") {
                                 event.identity = identity!!
@@ -334,7 +391,14 @@ class UserNDot {
                             sendToServer(eventConn, data, false)
                         }
                         "identity" -> {
+                            var identityConn = buildConnection(INITIALIZE_URL, "POST")
+                            logger.info("Identity for processing", data.objectData as String)
                             sendToServer(identityConn, data, true)
+                        }
+                        "track" -> {
+                            var trackingConn = buildConnection(EVENT_TRACKING_URL,"POST")
+                            logger.info("Tracking for processing", data.objectData as String)
+                            sendToServer(trackingConn,data,false)
                         }
                     }
                 }
@@ -349,10 +413,10 @@ class UserNDot {
     }
 
     private fun sendToServer(conn: HttpURLConnection, data: Data?, process: Boolean) {
-
-        if (data?.type != "identity") {
+        var dataToSend=data
+        if (dataToSend!=null) {
             var outputStream = conn.outputStream
-            outputStream.write((data?.objectData)!!.toByteArray())
+            outputStream.write(dataToSend.objectData?.toByteArray())
             outputStream.flush()
             outputStream.close()
         }
@@ -417,9 +481,8 @@ class UserNDot {
     private fun pushProfile(profile: EventUser?) {
         logger.info("inside push profile")
         if (profile == null) return
-        profile.identity = identity!!
-        //add token
-        profile.token=getFcmToken()
+        profile.identity = identity
+        profile.androidFcmToken=getFcmToken()
         var type = "eventUser"
         var data: Data = Data()
 
@@ -481,18 +544,22 @@ class UserNDot {
 
     }
 
-    fun onLogout() {
+    fun onUserLogout(){
+        postAsync(Runnable {
+            logout()
+        })
+    }
+    fun logout() {
 
         var map=HashMap<String,Any?>()
         map.put("userId",null)
         map.put("sessionId","")
-        map.put("deviceId","")
-        map.put("clientId",-1)
-        saveSharedPreference(context,map)       //remove identity of user
+        map.put("deviceId",identity?.deviceId?:"")
+        map.put("clientId",identity?.clientId?:-1)
+        saveSharedPreference(context,map)
         postAsync(Runnable {
             initializeIdentity()
         })
-        identity?.clientId = -1
         identity?.userId = null
         identity?.sessionId = ""
 
@@ -608,7 +675,7 @@ class UserNDot {
         return result.get("token")?.toString()?:null
     }
 
-    private fun createNotificationChannel(channelId: String?, channelName: String?) {
+    private fun createNotificationChannel(channelId: String, channelName: String?,priority:String?) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         var chName = channelName
@@ -619,25 +686,40 @@ class UserNDot {
             if (chName == null) {
                 chName = DEFAULT_NOTIFICATION_CHANNEL
             }
-            if (chId == null) {
-                chId = DEFAULT_CHANNEL_ID
+            var importance = NotificationManager.IMPORTANCE_DEFAULT
+            if(priority!=null){
+                when(priority){
+                    "high" -> importance=NotificationManager.IMPORTANCE_HIGH
+                    "normal" -> importance=NotificationManager.IMPORTANCE_MAX
+                }
             }
-
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(chId, chName, importance)
             notificationManager.createNotificationChannel(channel)
         }
     }
 
     private fun buildNotification(context: Context, bundle: Bundle) {
+        instance?.logger?.info("building notification")
         postAsync(Runnable {
-            //TODO save notification event call push event  clever tap has type of each event
-
+            var campaignId=bundle.getString("campaign_id")
+            var instance=UserNDot.instance
+            if(instance==null){
+                if (context!=null) getDefaultInstance(context)
+            }
+            var e = Event()
+            e.name = "Notification Received"
+            e.attributes= HashMap()
+            e.attributes.put("title", bundle.getString("title"))
+            e.attributes.put("body", bundle.getString("body"))
+            e.attributes.put("campaignId",campaignId)
+            e.userIdentified=false
+            instance?.pushEvent(e)
 
             var channelId = bundle.getString("channel_id", null)
             if (channelId == null) {
                 channelId = DEFAULT_CHANNEL_ID
             }
+
             //creating notification builder
             var nBuilder = NotificationCompat.Builder(context, channelId)
             //adding title
@@ -661,7 +743,7 @@ class UserNDot {
                 smallIcon = deviceInfo.getAppIconAsIntId(context)
             }
             //adding priority 
-            var priority = bundle.getString("pr")
+            var priority = bundle.getString("priority",null)
             var priorityInt = NotificationCompat.PRIORITY_DEFAULT
             if (priority != null) {
                 if (priority == "high") {
@@ -699,7 +781,7 @@ class UserNDot {
             val badgeIconParam = bundle.getString("badge_icon", null)
             if (badgeIconParam != null) {
                 try {
-                    val badgeIconType = Integer.parseInt(badgeIconParam!!)
+                    val badgeIconType = Integer.parseInt(badgeIconParam)
                     if (badgeIconType >= 0) {
                         nBuilder.setBadgeIconType(badgeIconType)
                     }
@@ -707,7 +789,8 @@ class UserNDot {
                     // no-op
                 }
             }
-            //TODO notificationid do this in create notification channel
+            var channelName=bundle.getString("channel_name",null)
+            createNotificationChannel(channelId,channelName = channelName,priority = priority)
             //add ringtone of notification
             try {
                 if (bundle.containsKey("sound")) {
@@ -738,7 +821,17 @@ class UserNDot {
                 logger.info("Could not process sound parameter")
             }
             //add action in notification builder
-            var action = addAction(context, bundle, DEFAULT_NOTIFICATION_ID,nBuilder)
+            logger.info("calling","add action")
+            var notificationId:Int?=null
+            try {
+                notificationId = Integer.parseInt(bundle.getString("notification_id", null))
+            }catch (ex:NumberFormatException){
+
+            }
+            if(notificationId==null) {
+                notificationId = (1..100).shuffled().first()
+            }
+            var action = addAction(context, bundle,notificationId,nBuilder)
             nBuilder.setAutoCancel(true)
             nBuilder.setContentIntent(pendintIntent)
             nBuilder.setSmallIcon(smallIcon)
@@ -746,16 +839,15 @@ class UserNDot {
             nBuilder.setContentTitle(contentTite)
             nBuilder.setPriority(priorityInt)
             nBuilder.setStyle(style)
-
-            triggerNotification(nBuilder, bundle)
+            triggerNotification(nBuilder, channelName,notificationId)
         })
     }
     
     private fun addAction(context: Context,bundle: Bundle,notificationId:Int,builder: NotificationCompat.Builder){
         var isUNDIntentServiceAvailable=isServiceAvailable(context,
                 UNDPushNotificationIntentService.MAIN_ACTION)
-        Log.e("is service available",isUNDIntentServiceAvailable.toString())
-        var actionString=bundle.getString("action",null)
+        var actionString=bundle.getString("actions",null)
+        Log.e("actionString","$actionString")
         var actionGroup:JSONArray
         if(actionString!=null){
             actionGroup=JSONArray(actionString)
@@ -768,19 +860,24 @@ class UserNDot {
                 //action must be json object and actionGroup is list of jsonArray
                 var action:JSONObject = actionGroup.getJSONObject(i)
                 var autoCancel = action.optBoolean("autoCancel")
-                var deepLink=action.optString("deep_link")
-                var lable=action.optString("label")   //mandatory
+                var deepLink=action.optString("deepLink")
+                var label=action.optString("label")   //mandatory
                 var icon=action.optString("icon")
-                var id=action.optString("id") //mandatory
+                var id=action.optString("actionId") //mandatory
                 var ico=0
                 if(!icon.isEmpty()){
                    try{
                        ico=context.resources.getIdentifier(icon,"drawable",context.packageName)
                    }catch(es:Exception){
-
+                       logger.debug("exception","inside action icon")
                    }
                 }
+                Log.e("autoCancel",autoCancel.toString())
+                Log.e("deep_link",deepLink)
+                Log.e("autoCancel",label)
+                Log.e("icon",ico.toString())
                 var sendToUNDIntentService = autoCancel && isUNDIntentServiceAvailable
+                logger.info("sendTound service",sendToUNDIntentService.toString())
                 var actionIntent: Intent
                 if (sendToUNDIntentService) {
                     actionIntent = Intent(UNDPushNotificationIntentService.MAIN_ACTION)
@@ -790,7 +887,7 @@ class UserNDot {
                     actionIntent.putExtra("type",UNDPushNotificationIntentService.TYPE_BUTTON_CLICK)
                 } else {
                     if (!deepLink.isEmpty()) {
-                        actionIntent = Intent(Intent.ACTION_VIEW, Uri.parse("dl"))
+                        actionIntent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
                     } else {
                         actionIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                     }
@@ -799,18 +896,19 @@ class UserNDot {
                     actionIntent.putExtras(bundle)
                     actionIntent.putExtra("autoCancel", autoCancel)
                     actionIntent.putExtra("actionId",id)
-                    //TODO notification is
                     actionIntent.putExtra("notification_id", notificationId)
                     actionIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
 
                 var pendingIntent: PendingIntent
                 if (sendToUNDIntentService) {
-                    pendingIntent = PendingIntent.getService(context, System.currentTimeMillis() as Int, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    pendingIntent = PendingIntent.getService(context, 7, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                 } else {
                     pendingIntent = PendingIntent.getActivity(context, System.currentTimeMillis() as Int, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                 }
-                builder.addAction(ico,lable,pendingIntent)
+                builder.addAction(ico,label,pendingIntent)
+                Log.e("pendint intent",pendingIntent.toString())
+                i++
             }
         }
     }
@@ -823,25 +921,13 @@ class UserNDot {
         var registerServicesForThisIntent=packageManager.queryIntentServices(intent,0)
         if(registerServicesForThisIntent.size>0){
             return true
-        }else{
-            return false
         }
+        return false
     }
     
-    private fun triggerNotification(builder:NotificationCompat.Builder,bundle: Bundle){
+    private fun triggerNotification(builder:NotificationCompat.Builder,channelName: String,notificationId: Int){
         var nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        var channelId = bundle.getString("channel_id", null)
-        var channelName = bundle.getString("channel_name", null)
-        var notificationId:Int?=null
-        try {
-            notificationId = Integer.parseInt(bundle.getString("notification_id", null))
-        }catch (ex:NumberFormatException){
-
-        }
-        if(notificationId==null) {
-            notificationId = (1..100).shuffled().first()
-        }
-        createNotificationChannel(channelId, channelName)
+//        createNotificationChannel(channelId, channelName)
         if (channelName == null) {
             nm.notify(DEFAULT_NOTIFICATION_CHANNEL, notificationId, builder.build())
         } else {

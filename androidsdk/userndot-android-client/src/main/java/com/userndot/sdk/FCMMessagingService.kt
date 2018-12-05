@@ -7,6 +7,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.userndot.sdk.android.Constants
 import com.userndot.sdk.android.Logger
+import com.userndot.sdk.android.UserNDot
 import com.userndot.sdk.android.UserNDot.Companion.createNotification
 
 class FCMMessagingService : FirebaseMessagingService() {
@@ -14,13 +15,13 @@ class FCMMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage?) {
         var bundle = Bundle()
         if (message?.data != null) {
-            if (message!!.data.size > 0) {
+            if (message.data.isNotEmpty()) {
                 for (data in message.data) {
                     Log.e(data.key,data.value)
                     bundle.putString(data.key, data.value)
                 }
                 if (bundle.containsKey(Constants.FROMUSERNDOT)) {
-                    Logger.d("FcmMessageListnerService received message from UserNDot ${bundle.toString()}")
+                    Logger.d("FcmMessageListnerService received message from UserNDot ${bundle}")
                     createNotification(applicationContext, bundle)
                 }
             }
@@ -32,7 +33,6 @@ class FCMMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(p0: String?) {
-        //save on server
-        //call it at login also
+        UserNDot.tokenRefresh(p0,applicationContext)
     }
 }

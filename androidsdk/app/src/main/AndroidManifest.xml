@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.userndot.androidsdk"
-    >
+    package="com.userndot.androidsdk">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyApplication"
@@ -14,50 +13,62 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         >
-
-        <activity
-            android:name=".MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name="com.userndot.sdk.FCMMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"></action>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
-        <service android:name="com.userndot.sdk.UNDPushNotificationIntentService"
+        <service
+            android:name="com.userndot.sdk.UNDPushNotificationIntentService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.userndot.PUSH_EVENT"/>
+                <action android:name="com.userndot.PUSH_EVENT" />
             </intent-filter>
         </service>
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more. -->
+        <!--
+     Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_ic_notification" />
-        <!--&lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming-->
-             <!--notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;-->
+        <!-- &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming -->
+        <!-- notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt; -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
         <meta-data
             android:name="USERNDOT_USER_ID"
-            android:value="userndot"
-            />
-        <meta-data android:name="USERNDOT_NOTIFICATION_ICON"
-            android:resource="@drawable/ic_stat_ic_notification"/>
+            android:value="userndot" />
+        <meta-data
+            android:name="USERNDOT_NOTIFICATION_ICON"
+            android:resource="@drawable/ic_stat_ic_notification" />
         <meta-data
             android:name="USERNDOT_TOKEN"
-            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjEwMDMiLCJjbGllbnRJZCI6IjEwMDEiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzEzMDAwNTQ1MDQsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.ocJTeX3DNof0E5ZdLIen25Mt0K3gf1zuYdkdAty_xiY05PcmF4aNqKeMy5UcjjKM-vMQkscCS6hUrEP6qlWjSg"
-            />
-        <meta-data android:name="STAGGING_TOKEN"
-            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYiLCJjbGllbnRJZCI6IjMiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzA1Mzc2MjM5MzMsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.yps1e8oJGdDJkN0C77gwjd_g9Jc2Ti4GvV-ViUMKoq0Msz8Dk8LGzSVXDyk6lh_HuX_FHuFjIh49OQFsUWSmYw"/>
+            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjEwMDMiLCJjbGllbnRJZCI6IjEwMDEiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzEzMDAwNTQ1MDQsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.ocJTeX3DNof0E5ZdLIen25Mt0K3gf1zuYdkdAty_xiY05PcmF4aNqKeMy5UcjjKM-vMQkscCS6hUrEP6qlWjSg" />
+        <meta-data
+            android:name="STAGING_TOKEN"
+            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYiLCJjbGllbnRJZCI6IjMiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzA1Mzc2MjM5MzMsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.yps1e8oJGdDJkN0C77gwjd_g9Jc2Ti4GvV-ViUMKoq0Msz8Dk8LGzSVXDyk6lh_HuX_FHuFjIh49OQFsUWSmYw" />
 
+        <activity android:name=".Main2Activity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="host"
+                    android:pathPrefix="/best"
+                    />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

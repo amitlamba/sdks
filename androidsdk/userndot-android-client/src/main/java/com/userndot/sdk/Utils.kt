@@ -12,8 +12,9 @@ import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.util.Log
 import com.userndot.sdk.android.Constants
+import com.userndot.sdk.android.Logger
 import org.json.JSONObject
-import java.io.IOException
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.HashMap
@@ -153,8 +154,7 @@ internal object Utils {
             val input = connection.inputStream
             return BitmapFactory.decodeStream(input)
         } catch (e: IOException) {
-
-            //            Logger.v("Couldn't download the notification icon. URL was: " + srcUrl);
+            Logger.d("exception in image downloading")
             return null
         } finally {
             try {

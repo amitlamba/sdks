@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import com.userndot.sdk.android.Constants
 import com.userndot.sdk.android.Logger
 import com.userndot.sdk.android.UserNDot
@@ -17,6 +18,7 @@ class UNDPushNotificationReceiver :BroadcastReceiver(){
             var extras=intent?.extras
             if(extras==null) return
             if(extras.containsKey(Constants.DEEP_LINK_KEY)){
+                Log.e("und_link",extras.getString(Constants.DEEP_LINK_KEY))
                 launchIntent=Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString(Constants.DEEP_LINK_KEY)))
             }else{
                 launchIntent=(context?.packageManager)!!.getLaunchIntentForPackage(context?.packageName)
