@@ -603,6 +603,6 @@ data class UserNDotConfig(
         val userNDotID: String,
         val fcmSenderID: String,
         val debugLevel: Int,
-        val logger: Logger?=null,
+        val logger: Logger,
         val sslPinning: Boolean
 )

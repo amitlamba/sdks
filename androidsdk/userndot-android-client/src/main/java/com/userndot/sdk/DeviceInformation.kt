@@ -59,18 +59,20 @@ class DeviceInformation {
     private fun setSdkVersion():Int{
         return Build.VERSION.SDK_INT
     }
-    fun getHeaderString(): String {
-        var sb = StringBuilder()
-        sb.append("appVersionName").append("=").append(this.appVersionName).append(";")
-                .append("osName").append("=").append(this.osName).append(";")
-                .append("osVersion").append("=").append(this.osVersion).append(";")
-                .append("manufacturer").append("=").append(this.manufacturer).append(";")
-                .append("sdkVersion").append("=").append(this.sdkVersion).append(";")
-                .append("model").append("=").append(this.model).append(";")
-                .append("appPackageName").append("=").append(this.appPackageName).append(";")
-        return sb.toString()
-    }
+    override fun toString(): String {
 
+        return "Mobile-Agent/" +
+                "${this.osName}/" +
+                "${this.osVersion}/" +
+                "App Embedded Browser/" +
+                "1.0/" +
+                //Todo we check for mobile or tablet by there screen size
+                "Mobile/" +
+                "${this.model}/" +
+                "${this.appPackageName}/" +
+                "${this.appVersionName}"
+
+    }
     fun getAppIconAsIntId(context: Context):Int{
         val ai = context.applicationInfo
         return ai.icon

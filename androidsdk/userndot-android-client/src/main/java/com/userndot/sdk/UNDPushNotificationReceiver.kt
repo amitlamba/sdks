@@ -1,5 +1,6 @@
 package com.userndot.sdk
 
+import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -13,29 +14,32 @@ import java.lang.Exception
 class UNDPushNotificationReceiver :BroadcastReceiver(){
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        try{
+
+        if(context!=null && intent!=null){
+            try{
             var launchIntent:Intent
-            var extras=intent?.extras
+            var extras=intent.extras
             if(extras==null) return
             if(extras.containsKey(Constants.DEEP_LINK_KEY)){
                 Log.e("und_link",extras.getString(Constants.DEEP_LINK_KEY))
                 launchIntent=Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString(Constants.DEEP_LINK_KEY)))
             }else{
-                launchIntent=(context?.packageManager)!!.getLaunchIntentForPackage(context?.packageName)
-                if(launchIntent==null) return
+                launchIntent=(context.packageManager).getLaunchIntentForPackage(context.packageName)
+                if(launchIntent==null) { Logger.i("USERNDOT","Not able to get default app intent."); return}
             }
 
             UserNDot.handleNotificationClicked(context,extras)
 
             launchIntent.flags=Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             launchIntent.putExtras(extras)
-            //TODO
+            //if activity not found then throw exception
+            context.startActivity(launchIntent)
+            Logger.i("USERNDOT","UNDPushNotification click is handled")
 
-            context?.startActivity(launchIntent)
-            Logger.d("UNDPushNotification click is handled")
-
-        }catch (ex:Exception){
-            Logger.d("UNDPushNotification click handle excception ${ex.localizedMessage}")
+        }catch (ex: ActivityNotFoundException){
+            Logger.i("USERNDOT","UNDPushNotification click handle excception ${ex.localizedMessage}")
         }
+        }
+
     }
 }

@@ -48,6 +48,7 @@ class UserNDotDatabase {
             if(database==null){
                 synchronized(this) {
                     if(database == null) {
+                        //TODO  below line of code always return a database instance
                         this.database = Room.databaseBuilder(context, MyDatabase::class.java, "userndot").build()
                     }
                     return this.database!!

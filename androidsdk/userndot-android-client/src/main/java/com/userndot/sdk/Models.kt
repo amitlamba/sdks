@@ -12,12 +12,7 @@ import kotlin.collections.HashMap
 open class Event {
     lateinit var name: String
     var identity: Identity = Identity()
-    //    private var creationTime: LocalDateTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//        LocalDateTime.now(ZoneId.of("UTC"))
-//    } else {
-//        TODO("VERSION.SDK_INT < O")
-//
-//    }
+    var creationDate: Long?=null
     var ipAddress: String? = null
     var city: String? = null
     var state: String? = null
@@ -74,11 +69,7 @@ class EventUser {
     var address: String? = null
     var countryCode: String? = null
     var additionalInfo: HashMap<String, Any> = hashMapOf()
-//    var creationDate: LocalDateTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//        LocalDateTime.now(ZoneId.of("UTC"))
-//    } else {
-//        TODO("VERSION.SDK_INT < O")
-//    }
+    var creationTime:Long?=null
 
 }
 
