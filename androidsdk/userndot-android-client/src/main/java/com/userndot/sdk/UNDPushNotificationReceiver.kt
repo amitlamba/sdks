@@ -21,7 +21,7 @@ class UNDPushNotificationReceiver :BroadcastReceiver(){
             var extras=intent.extras
             if(extras==null) return
             if(extras.containsKey(Constants.DEEP_LINK_KEY)){
-                Log.e("und_link",extras.getString(Constants.DEEP_LINK_KEY))
+                Logger.i("und_link",extras.getString(Constants.DEEP_LINK_KEY))
                 launchIntent=Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString(Constants.DEEP_LINK_KEY)))
             }else{
                 launchIntent=(context.packageManager).getLaunchIntentForPackage(context.packageName)

@@ -12,7 +12,7 @@ import kotlin.collections.HashMap
 open class Event {
     lateinit var name: String
     var identity: Identity = Identity()
-    var creationDate: Long?=null
+    var creationTime: Long?=null
     var ipAddress: String? = null
     var city: String? = null
     var state: String? = null
@@ -69,7 +69,7 @@ class EventUser {
     var address: String? = null
     var countryCode: String? = null
     var additionalInfo: HashMap<String, Any> = hashMapOf()
-    var creationTime:Long?=null
+    var creationDate:Long?=null
 
 }
 

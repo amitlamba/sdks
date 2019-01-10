@@ -70,7 +70,9 @@ class DeviceInformation {
                 "Mobile/" +
                 "${this.model}/" +
                 "${this.appPackageName}/" +
-                "${this.appVersionName}"
+                "${this.appVersionName}/"+
+                "${this.manufacturer}/"+
+                "${this.sdkVersion}"
 
     }
     fun getAppIconAsIntId(context: Context):Int{

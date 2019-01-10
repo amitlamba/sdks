@@ -288,6 +288,8 @@ class UserNDot {
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Authorization", config.userNDotID)
         connection.setRequestProperty("User-Agent", "mobile")
+        connection.setRequestProperty("type","ANDROID")
+        connection.setRequestProperty("androidAppId",context.packageName)
         if (methodType.equals("POST", true)) {
             connection.doInput = true;
             connection.doOutput = true;
@@ -470,11 +472,11 @@ class UserNDot {
         profile.androidFcmToken = getFcmToken()
         //we are not using time
         var time = getDate()
-        profile.creationTime= System.currentTimeMillis()
+        profile.creationDate= System.currentTimeMillis()
         var type = "eventUser"
         var data: Data = Data()
         var jsonObject = mapper.writeValueAsString(profile)
-        data.objectData = jsonObject;
+        data.objectData = jsonObject
         data.time = time
         data.type = type
 
@@ -503,7 +505,7 @@ class UserNDot {
         event.identity = identity
         var type = "event"
         var time = getDate()
-        event.creationDate= System.currentTimeMillis()
+        event.creationTime= System.currentTimeMillis()
         var location = getLocation()
         var longitude = (location?.longitude)?.toString()
         var latitude = (location?.latitude)?.toString()
