@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("event","clicked")
             var e = Event()
             e.city = "gurgaon"
-            e.name = "Search"
+            e.name = "Add to Cart"
             e.attributes= HashMap()
             e.attributes.put("Item","Shoes")
             e.attributes.put("new","new")
@@ -66,12 +66,12 @@ class MainActivity : AppCompatActivity() {
         (profile).setOnClickListener {
             Log.e("profile","clicked")
             var user = EventUser()
-            user.uid="user3"
+            user.uid="user7"
             user.city="Gurugram"
             user.address=""
             user.country="India"
             user.countryCode="91"
-            user.email="temp@gmail.com"
+            user.email="jogendertemp@gmail.com"
             user.dob="1993-01-01"
             user.firstName="Jogendra"
             user.gender="Male"

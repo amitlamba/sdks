@@ -53,11 +53,8 @@
             android:name="USERNDOT_NOTIFICATION_ICON"
             android:resource="@drawable/ic_stat_ic_notification" />
         <meta-data
-            android:name="USERNDOT_TOKEN"
-            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjEwMDMiLCJjbGllbnRJZCI6IjEwMDEiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzEzMDAwNTQ1MDQsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.ocJTeX3DNof0E5ZdLIen25Mt0K3gf1zuYdkdAty_xiY05PcmF4aNqKeMy5UcjjKM-vMQkscCS6hUrEP6qlWjSg" />
-        <meta-data
             android:name="STAGING_TOKEN"
-            android:value="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYiLCJjbGllbnRJZCI6IjMiLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0VWRU5UIl0sImNyZWF0ZWQiOjE1MzA1Mzc2MjM5MzMsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.yps1e8oJGdDJkN0C77gwjd_g9Jc2Ti4GvV-ViUMKoq0Msz8Dk8LGzSVXDyk6lh_HuX_FHuFjIh49OQFsUWSmYw" />
+            android:value="eyJUT0tFTl9ST0xFIjoiRVZFTlRfQU5EUk9JRCIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYiLCJjbGllbnRJZCI6IjMiLCJyb2xlcyI6WyJST0xFX0VWRU5UIiwiUk9MRV9VU0VSIl0sImNyZWF0ZWQiOjE1NDcwMTU5NTc2NDYsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.q3drTcMCD5Whkw-BilmP-CLwcQsxOk2JMEpaOiT5hnTClhesZtUQAgf0D6AYCfXp-9WwOPUnAkHs-15sj9Yt8g" />
 
         <activity android:name=".Main2Activity">
             <intent-filter>

@@ -187,7 +187,7 @@ class UserNDot {
             }
             //Todo enhancement send token to server currently we are saving it local and send to server when user login
             var map = HashMap<String, Any?>()
-            map.put("token", token)
+            map.put("FCM_TOKEN", token)
             saveSharedPreference(context, map)               //saving token locally
         }
 
@@ -378,7 +378,7 @@ class UserNDot {
                         }
                         "identity" -> {
                             var identityConn = buildConnection(INITIALIZE_URL, "POST")
-
+                            logger.info("Package Name",context.packageName)
                             logger.info("Identity ready for processing ${data.objectData}")
                             sendToServer(identityConn, data, true)
                         }
@@ -690,6 +690,7 @@ class UserNDot {
 
     private fun buildNotification(context: Context, bundle: Bundle) {
         postAsync(Runnable {
+
             sendNotificationReceiveEvent(bundle,context)
 
             var channelId = bundle.getString("channel_id", null)
@@ -835,6 +836,7 @@ class UserNDot {
     }
 
     private fun sendNotificationReceiveEvent(bundle: Bundle,context: Context) {
+        logger.info("Sending Notification Received Event.")
         var e = Event()
         e.name = "Notification Received"
         e.attributes = HashMap()
@@ -932,7 +934,7 @@ class UserNDot {
         val badgeIconParam = bundle.getString("badge_icon", null)
         if (badgeIconParam != null) {
             try {
-                val badgeIconType = Integer.parseInt(badgeIconParam)
+                val badgeIconType = getBadgeIcon(badgeIconParam)
                 if (badgeIconType >= 0) {
                     nBuilder.setBadgeIconType(badgeIconType)
                 }
@@ -942,7 +944,14 @@ class UserNDot {
             }
         }
     }
-
+    private fun getBadgeIcon(icon:String):Int{
+        when(icon){
+            "BADGE_ICON_SMALL" -> return NotificationCompat.BADGE_ICON_SMALL
+            "BADGE_ICON_LARGE" -> return NotificationCompat.BADGE_ICON_LARGE
+            "BADGE_ICON_NONE" -> return NotificationCompat.BADGE_ICON_NONE
+            else -> return 0
+        }
+    }
     private fun getNotificationId(bundle: Bundle): Int {
         try {
             return Integer.parseInt(bundle.getString("notification_id", null))
