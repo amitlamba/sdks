@@ -54,7 +54,7 @@
             android:resource="@drawable/ic_stat_ic_notification" />
         <meta-data
             android:name="STAGING_TOKEN"
-            android:value="eyJUT0tFTl9ST0xFIjoiRVZFTlRfQU5EUk9JRCIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiJldmVudF9qb2dlbmRlci5saXZlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYiLCJjbGllbnRJZCI6IjMiLCJyb2xlcyI6WyJST0xFX0VWRU5UIiwiUk9MRV9VU0VSIl0sImNyZWF0ZWQiOjE1NDcwMTU5NTc2NDYsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.q3drTcMCD5Whkw-BilmP-CLwcQsxOk2JMEpaOiT5hnTClhesZtUQAgf0D6AYCfXp-9WwOPUnAkHs-15sj9Yt8g" />
+            android:value="eyJUT0tFTl9ST0xFIjoiRVZFTlRfQU5EUk9JRCIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiJldmVudF9qb2dlbmRlcjAwNy5qc0BnbWFpbC5jb20iLCJ1c2VySWQiOiIxMDM3IiwiY2xpZW50SWQiOiIxMDE4Iiwicm9sZXMiOlsiUk9MRV9FVkVOVCIsIlJPTEVfVVNFUiJdLCJjcmVhdGVkIjoxNTQ3MDMyMDAxMjg5LCJleHAiOjkyMjMzNzIwMzY4NTQ3NzV9.kDQownKGrAKEQ1LKm_9W852un6Ovezcx3X6_S26EXeKHKpzP2tFz84kfe7LdA829dqsax9FV7AH-CpjdPncAnA" />
 
         <activity android:name=".Main2Activity">
             <intent-filter>

@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         (profile).setOnClickListener {
             Log.e("profile","clicked")
             var user = EventUser()
-            user.uid="user7"
+            user.uid="user8"
             user.city="Gurugram"
             user.address=""
             user.country="India"

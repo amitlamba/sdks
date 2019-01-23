@@ -63,9 +63,9 @@ class DeviceInformation {
 
         return "Mobile-Agent/" +
                 "${this.osName}/" +
-                "${this.osVersion}/" +
-                "App Embedded Browser/" +
-                "1.0/" +
+                "${this.osVersion}".replace(regex = Regex("\\..*"),replacement = "") +
+                "/App Embedded Browser/" +
+                "1/" +
                 //Todo we check for mobile or tablet by there screen size
                 "Mobile/" +
                 "${this.model}/" +
