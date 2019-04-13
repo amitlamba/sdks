@@ -42,7 +42,8 @@ class Identity(
         var sessionId: String = "",
         // id of event user, this id is assigned when a user profile is identified.
         var userId: String? = null,
-        var clientId: Int? = -1
+        var clientId: Int? = -1,
+        var idf:Int=0
 )
 
 

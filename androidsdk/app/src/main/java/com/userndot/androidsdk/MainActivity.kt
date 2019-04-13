@@ -8,6 +8,7 @@ import android.widget.Button
 import com.userndot.sdk.android.Event
 import com.userndot.sdk.android.EventUser
 import com.userndot.sdk.android.UserNDot
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         (profile).setOnClickListener {
             Log.e("profile","clicked")
             var user = EventUser()
-            user.uid="user8"
+            user.uid="user50"
             user.city="Gurugram"
             user.address=""
             user.country="India"

@@ -54,7 +54,7 @@ class UserNDot {
     private var lock: Lock
     private var commsRunnable: Runnable? = null
     private lateinit var database: MyDatabase
-    private var BASE_URL = "http://192.168.0.109:8090"
+    private var BASE_URL = "https://userndot.com"
     private var DEFAULT_URL = BASE_URL + "/event/check"
     private var INITIALIZE_URL = BASE_URL + "/event/event/initialize"
     private var PROFILE_URL = BASE_URL + "/event/push/profile"
@@ -81,14 +81,14 @@ class UserNDot {
 
         var debugLevel = LogLevel.INFO
         var instance: UserNDot? = null
-        fun getDefaultInstance(context: Context): UserNDot? {
+        fun getDefaultInstance(context: Context,logLevel: String="INFO"): UserNDot? {
             try {
                 //this will throw NameNotFound exception
                 var token = getManifestInfo(context)   //getting manifest info
                 var map = HashMap<String, Any?>()
                 map.put("AUTH_TOKEN", token)
                 saveSharedPreference(context, map)     //saving token in shared preference
-                var config = getConfigInstance(token)  //build config object
+                var config = getConfigInstance(token, LogLevel.valueOf(logLevel))  //build config object
                 return getInstanceWithConfig(context, config)
             } catch (ex: PackageManager.NameNotFoundException) {
                 Logger.i("Error","Error occur in UserNDot instance creation.")
@@ -130,9 +130,9 @@ class UserNDot {
         /*
         return UserNDotConfig object
          */
-        private fun getConfigInstance(token: String): UserNDotConfig {
-            var logger: Logger = Logger.getInstance(UserNDot.LogLevel.INFO)
-            return UserNDotConfig(userNDotID = token, fcmSenderID = "", debugLevel = 0, logger = logger, sslPinning = false)
+        private fun getConfigInstance(token: String,logLevel: LogLevel=LogLevel.INFO): UserNDotConfig {
+            var logger: Logger = Logger.getInstance(logLevel)
+            return UserNDotConfig(userNDotID = token, fcmSenderID = "", debugLevel = logLevel.intValue, logger = logger, sslPinning = false)
         }
 
         fun createNotification(context: Context, bundle: Bundle) {
@@ -159,7 +159,7 @@ class UserNDot {
                     var map = HashMap<String, Any>()
                     map.put("title", notification.getString("title"))
                     map.put("body", notification.getString("body"))
-                    map.put("campaignId", campaignId)
+                    map.put("campaign_id", campaignId.toInt())
                     event.attributes = map
                     it.pushEventData(event)
                 })
@@ -842,10 +842,11 @@ class UserNDot {
         e.attributes = HashMap()
         e.attributes.put("title", bundle.getString("title"))
         e.attributes.put("body", bundle.getString("body"))
-        e.attributes.put("campaignId", bundle.getString("campaign_id"))
-        instance?: getDefaultInstance(context)?.let {
+        e.attributes.put("campaign_id", bundle.getString("campaign_id").toInt())
+        (instance?: getDefaultInstance(context))?.let {
             it.pushEvent(e)
         }
+
     }
 
     private fun getSmallIcon(bundle: Bundle): Int {
