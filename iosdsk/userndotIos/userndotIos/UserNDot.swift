@@ -9,8 +9,6 @@
 import Foundation
 import UIKit
 import MapKit
-import CoreData
-import SQLite3
 import SwiftyJSON
 
 /*
@@ -23,18 +21,18 @@ import SwiftyJSON
  */
 public class UserNDot: NSObject,CLLocationManagerDelegate {
     
-    var semaphore:DispatchSemaphore
-    var heartBeat:Bool = false
-    var undToken:String = ""
-    let queue = DispatchQueue(label: "com.userndot.save",qos: .userInitiated)
-    let sendQueue = DispatchQueue(label: "com.userndot.send",qos: .userInitiated)
+    private var semaphore:DispatchSemaphore
+    private var heartBeat:Bool = false
+    private var undToken:String = ""
+    private let queue = DispatchQueue(label: "com.userndot.save",qos: .userInitiated)
+    private let sendQueue = DispatchQueue(label: "com.userndot.send",qos: .userInitiated)
     private var identity: Identity
-    var locationManager: CLLocationManager
-    let deviceInfo:DeviceInfo
-    var db:OpaquePointer?
-    var storageLocation:String = ""
-    let threadSleepIntervalInMilli = 0.010
-    let eventSendInterval:Int
+    private var locationManager: CLLocationManager
+    private let deviceInfo:DeviceInfo
+    private let threadSleepIntervalInMilli = 0.010
+    private let eventSendInterval:Int
+    private let persistentStore:PersistentStore?
+    private let locationUpdateInterval:Int = 5000000000
     
     private  init(_ location:Bool = false,_ eventSendInterval:Int = 10) {
         
@@ -42,25 +40,20 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
         locationManager = CLLocationManager()
         deviceInfo = DeviceInfo()
         semaphore = DispatchSemaphore(value: 0)
+        persistentStore = PersistentStore(eventSendInterval: eventSendInterval , dispatchQueue:sendQueue)
         self.eventSendInterval = eventSendInterval
-        //submit task initialize to new queue.
         super.init()
         locationManager.delegate = self
         self.undToken = Bundle.main.object(forInfoDictionaryKey: "UNDToken") as! String
-        do {
-            storageLocation = try FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent("userndot.sqlite").path
-            print(storageLocation)
-        }catch{
-            print("Error during storagelocation.")
-        }
         if location {
             DispatchQueue.global().async {
                 self.getLocation()
             }
-            DispatchQueue.global().asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 5000000), execute: {
+            DispatchQueue.global().asyncAfter(deadline: DispatchTime(uptimeNanoseconds: UInt64(locationUpdateInterval)), execute: {
                 self.disableLocationService()
             })
         }
+        
         initializeIdentity()
     }
     //builder pattern
@@ -97,8 +90,6 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
         UserDefaults.standard.setValue(token, forKeyPath: "UNDToken")
     }
     private func initializeIdentity(){
-        openDataBase()
-        initializeDataBase()
         //UserDefaults.standard.removeObject(forKey: "und_identity")
         let decodedIdentity = UserDefaults.standard.data(forKey: "und_identity")
         if decodedIdentity == nil {
@@ -115,7 +106,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
             }else{
                 identity = storedIdentity
                 sendQueue.async {
-                    self.sendQueue(dataModels: self.getAllDataFromLocalStorage())
+                    self.sendQueue(dataModels: self.persistentStore?.getAllDataFromLocalStorage() ?? [])
                 }
             }
         }
@@ -126,99 +117,16 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
             let data = try JSONEncoder().encode(identity)
             let stringJson = JSON(data).rawString()!
             let dataModel = DataModel(id: -1,type: Type.IDENTITY.rawValue,data: stringJson)
-            saveToLocalStorage(dataModel: dataModel)
+            persistentStore?.saveToLocalStorage(dataModel: dataModel,userNDot: self)
         }catch{
             print("Error during identity marshalling")
         }
     }
-    private func saveToLocalStorage(dataModel:DataModel,fromUserInteraction:Bool = false){
-        // print(dataModel.getData)
-        // NSData.base64EncodedString(dataModel.getData)
-        
-        let insertSql = "insert into data_model (type,data) values ('\(dataModel.getType)','\(dataModel.getData)')"
-        let result = sqlite3_exec(db, insertSql, nil, nil, nil)
-        if result == SQLITE_OK{
-            print("Saved Successfully.")
-            let changes =  sqlite3_changes(self.db)
-            let id = sqlite3_last_insert_rowid(self.db)
-            if fromUserInteraction {
-                sendQueue.asyncAfter(deadline: .now() + .seconds(eventSendInterval), execute: {
-                        self.sendQueue(dataModels: self.getAllDataFromLocalStorage())
-                })
-            }else{
-                //schedule a task immediately
-                sendQueue.asyncAfter(deadline: .now(), execute: {
-                        self.sendQueue(dataModels: self.getAllDataFromLocalStorage())
-                })
-            }
-//            sendQueue.async {
-//                self.sendQueue(dataModels: self.getAllDataFromLocalStorage())
-//            }
-        }else{
-            print("Error during save data model.")
-            print(String(cString: sqlite3_errmsg(db)))
-            print(String(cString: sqlite3_errstr(result)))
-        }
-    }
     
-    private func getAllDataFromLocalStorage() -> Array<DataModel>{
-        let selectSql = "select id,type,data from data_model order by id asc"
-        var stmt :OpaquePointer? = nil
-        var result = sqlite3_prepare_v2(self.db, selectSql, -1, &stmt, nil)
-        var dataModels = Array<DataModel>()
-        if result == SQLITE_OK{
-            result = sqlite3_step(stmt)
-            while result == SQLITE_ROW {
-                let id = sqlite3_column_int64(stmt, 0)
-                let type = String(cString: sqlite3_column_text(stmt, 1))
-                let data = String(cString: sqlite3_column_text(stmt, 2))
-                let dataModel = DataModel(id: id,type: type,data: data)
-                dataModels.append(dataModel)
-                result = sqlite3_step(stmt)
-            }
-            sqlite3_finalize(stmt)
-        }else{
-            print(String(cString: sqlite3_errstr(result)))
-        }
-        return dataModels
-    }
-    private func deleteFromLocalStorage(id:Int64){
-        let deleteSql = "delete from data_model where id = \(id)"
-        let result = sqlite3_exec(db, deleteSql, nil, nil, nil)
-        if result == SQLITE_OK {
-            print("delete \(sqlite3_changes(db)) for id \(id)")
-        }else{
-            print(String(cString: sqlite3_errstr(result)))
-        }
-    }
-    private func initializeDataBase(){
-        let initialize = "create table if not exists data_model (id integer primary key,type varchar(50),data varchar(1024))"
-        let result = sqlite3_exec(db, initialize, nil, nil, nil)
-        if result == SQLITE_OK {
-            print("db initialized.")
-        }else{
-            print("Error duing table creation.")
-        }
-    }
     
-    private func openDataBase(){
-        var result = SQLITE_OK
-        result = sqlite3_open(storageLocation, &self.db)
-        if result == SQLITE_OK {
-            print("Db open successfully.")
-        }else{
-            print("Error opening db.")
-        }
-    }
-    private func closeDataBase(){
-        var result = SQLITE_OK
-        result = sqlite3_close(db)
-        if result == SQLITE_OK {
-            print("Db closed successfully.")
-        }else{
-            print("Error closing db.")
-        }
-    }
+    
+    
+    
     
     func checkHeartBeat()->Bool{
         var urlRequest = URLRequest(url: URL(string: EndPoint.HEATBEAT.rawValue)!)
@@ -254,7 +162,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
         return heartBeat
     }
     
-    private func sendQueue(dataModels:[DataModel]){
+    func sendQueue(dataModels:[DataModel]){
         print("size of \(dataModels.count)")
         if dataModels.count>0 && checkHeartBeat(){
             for data in dataModels {
@@ -300,7 +208,9 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
                 }
             }
         }else{
-            print("Connectivity fail")
+            if dataModels.count > 0{
+                print("Connectivity fail")
+            }
         }
     }
     
@@ -308,7 +218,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
         
             if error == nil{
                 print(String(bytes: data!, encoding: .utf8))
-                deleteFromLocalStorage(id: id)
+                persistentStore?.deleteFromLocalStorage(id: id)
              if requestType == Type.EVENTUSER.rawValue || requestType == Type.IDENTITY.rawValue{
                 let jsonObject = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String:Any]
                 let d = jsonObject["data"] as! [String:Any]
@@ -404,7 +314,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
             //JSON(event).rawString()!
         let rawData = String(data: data, encoding: .utf8)!
         let dataModel = DataModel(type: Type.EVENT.rawValue, data: rawData)
-        saveToLocalStorage(dataModel: dataModel,fromUserInteraction: true)
+        persistentStore?.saveToLocalStorage(dataModel: dataModel,userNDot:self,fromUserInteraction: true)
     }
     
     func saveProfileEvent(eventUser:EventUser){
@@ -412,14 +322,14 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
         let rawData = String(data: data, encoding: .utf8)!
             //JSON(eventUser).rawString()!
         let dataModel = DataModel(type: Type.EVENTUSER.rawValue, data: rawData)
-        saveToLocalStorage(dataModel: dataModel,fromUserInteraction: true)    }
+        persistentStore?.saveToLocalStorage(dataModel: dataModel,userNDot:self,fromUserInteraction: true)    }
     
     func saveInitializeEvent(identity:Identity){
         let data = try! JSONEncoder().encode(identity)
         //let rawData = JSON(identity).rawString()!
         let rawData = String(data: data, encoding: .utf8)!
         let dataModel = DataModel(type: Type.IDENTITY.rawValue, data: rawData)
-        saveToLocalStorage(dataModel: dataModel,fromUserInteraction: true)    }
+        persistentStore?.saveToLocalStorage(dataModel: dataModel,userNDot:self,fromUserInteraction: true)    }
     
     public func logout(){
         identity.userId = nil
@@ -513,8 +423,6 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
     deinit {
         //perfrom cleanup
         print("deinitialization...")
-        closeDataBase()
-        db = nil
     }
 }
 

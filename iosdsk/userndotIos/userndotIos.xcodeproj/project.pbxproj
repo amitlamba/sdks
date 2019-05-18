@@ -16,6 +16,7 @@
 		8D791B8B228ED02D00236665 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D791B8A228ED02D00236665 /* DeviceInfo.swift */; };
 		8D791B8D228ED03600236665 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D791B8C228ED03600236665 /* Test.swift */; };
 		8D791BAB228ED12D00236665 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D791BAA228ED12D00236665 /* SwiftyJSON.framework */; };
+		8D791BB3228FEC6F00236665 /* PersistentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D791BB2228FEC6F00236665 /* PersistentStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		8D791B8A228ED02D00236665 /* DeviceInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
 		8D791B8C228ED03600236665 /* Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		8D791BAA228ED12D00236665 /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwiftyJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D791BB2228FEC6F00236665 /* PersistentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 				8D791B6F228ECE6B00236665 /* userndotIos.h */,
 				8D791B70228ECE6B00236665 /* Info.plist */,
 				8D791B7D228ECF1C00236665 /* UserNDot.swift */,
+				8D791BB2228FEC6F00236665 /* PersistentStore.swift */,
 			);
 			path = userndotIos;
 			sourceTree = "<group>";
@@ -178,6 +181,7 @@
 				8D791B8D228ED03600236665 /* Test.swift in Sources */,
 				8D791B85228ED01200236665 /* Event.swift in Sources */,
 				8D791B83228ED00800236665 /* Identity.swift in Sources */,
+				8D791BB3228FEC6F00236665 /* PersistentStore.swift in Sources */,
 				8D791B87228ED01C00236665 /* EventUser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
