@@ -243,7 +243,7 @@ class UserNDot {
             map.put("clientId", -1)
             var result = getSharedPreference(map)
 
-            if (result["sessionId"] == "" || result["deviceId"] == "") {
+            if (result["sessionId"] == "" || result["deviceId"] == "" || result["userId"]==null) {
                 var data = Data()
                 data.type = "identity"
                 data.objectData = mapper.writeValueAsString(identity)
@@ -446,6 +446,7 @@ class UserNDot {
             map.put("sessionId", identity.sessionId)
             map.put("deviceId", identity.deviceId)
             map.put("clientId", identity.clientId)
+            map.put("idf",identity.idf)
             saveSharedPreference(context, map)       //override previous identity with newone
         }
     }
