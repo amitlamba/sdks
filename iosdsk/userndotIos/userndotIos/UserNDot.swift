@@ -5,6 +5,8 @@
 //  Created by Jogender on 17/05/19.
 //  Copyright © 2019 DigiCologies. All rights reserved.
 //
+//problem how to make singleton
+//Method cannot be declared public because its parameter uses an internal type
 
 import Foundation
 import UIKit
@@ -29,10 +31,11 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
     private var identity: Identity
     private var locationManager: CLLocationManager
     private let deviceInfo:DeviceInfo
-    private let threadSleepIntervalInMilli = 0.010
+    //private let threadSleepIntervalInMilli = 0.010
     private let eventSendInterval:Int
     private let persistentStore:PersistentStore?
     private let locationUpdateInterval:Int = 5000000000
+    private var breakTheLoop = false
     
     private  init(_ location:Bool = false,_ eventSendInterval:Int = 10) {
         
@@ -82,9 +85,8 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
             return nil
         }
         UserNDot.saveTokenToFileSystem(token: token as! String)
-        return UserNDot()
+        return UserNDot(location)
     }
-    public static func test(){}
     
     private static func saveTokenToFileSystem(token:String){
         UserDefaults.standard.setValue(token, forKeyPath: "UNDToken")
@@ -148,6 +150,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
             }
             print(String(data: data!, encoding: .utf8))
             heartBeat = true
+            self.breakTheLoop = false
             self.semaphore.signal()
         })
         task.resume()
@@ -166,6 +169,10 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
         print("size of \(dataModels.count)")
         if dataModels.count>0 && checkHeartBeat(){
             for data in dataModels {
+                if breakTheLoop {
+                    print("Breaking the loop.")
+                    break
+                }
                 print("sending id \(data.getId)")
                 do{
                     switch data.getType {
@@ -233,6 +240,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
                 UserDefaults.standard.set(encodedIdentity, forKey: "und_identity")
             }
             }else{
+                breakTheLoop = true
                 print("Error \(error?.localizedDescription)")
                 //throw UserNDotError.runtimeError(error?.localizedDescription)
             }
@@ -260,13 +268,10 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
             processResponse(id,requestType,data,response,error)
         })
         urlSessionDataTask.resume()
-        //        repeat{
-        //            Thread.sleep(forTimeInterval: TimeInterval(floatLiteral: threadSleepIntervalInMilli))
-        //        }while !complete
         semaphore.wait()
     }
-   public func pushEvent(){
-        let uevent = UEvent(name: "search")
+    public func pushEvent(name:String){
+        let uevent = UEvent(name: name)
         let event = Event()
         event.name = uevent.name
         event.attributes = JSON(uevent.attributes)
@@ -350,19 +355,19 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
     func getLocation() -> (lat:Double?,long:Double?){
         let location = locationManager.location
         let coordinate = location?.coordinate
-        var lastLocationDate:Date? = location?.timestamp
-        if lastLocationDate == nil {
-            lastLocationDate = Date()
-        }
-        let d = Calendar.current
-        let newDate = d.date(byAdding: .hour, value: 6, to: lastLocationDate!)
-        let currentDate = Date()
-        if(newDate!.compare(currentDate).rawValue >= 0){
+//        var lastLocationDate:Date? = location?.timestamp
+//        if lastLocationDate == nil {
+//            lastLocationDate = Date()
+//        }
+//        let d = Calendar.current
+//        let newDate = d.date(byAdding: .hour, value: 6, to: lastLocationDate!)
+//        let currentDate = Date()
+//        if(newDate!.compare(currentDate).rawValue >= 0){
             //get new location
             //start updating location.
             //in queue add stop updationg location but check accuracy also.
-            setUpCoreLocation()
-        }
+ //           setUpCoreLocation()
+//        }
         return (lat:coordinate?.latitude ?? 90,long:coordinate?.longitude ?? 90)
     }
     
@@ -411,7 +416,7 @@ public class UserNDot: NSObject,CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        //let lastLocation = locations.last!
+       // let lastLocation = locations.last!
         //print("corrd \(lastLocation.coordinate)")
     }
     

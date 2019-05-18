@@ -13,6 +13,7 @@ import userndotIos
 class ViewController: UIViewController {
 
     public var userndot :UserNDot?
+    public var i = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +29,8 @@ class ViewController: UIViewController {
         userndot?.pushProfile()
     }
     @IBAction func pushEvent(_ sender: UIButton) {
-        userndot?.pushEvent()
+        userndot?.pushEvent(name:"search\(i)")
+        i+=1;
     }
 }
 
